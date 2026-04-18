@@ -19,7 +19,7 @@ function UserPhotos() {
 
         {photos.map((photo) => {
           
-          // 👇 xử lý tên file
+          //  xử lý tên file
           const baseName = photo.file_name.split(".")[0].toLowerCase();
           const ext = photo.file_name.split(".")[1];
 
