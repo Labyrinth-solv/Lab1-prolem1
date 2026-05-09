@@ -1,43 +1,55 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Typography } from "@mui/material";
 import { useParams, Link } from "react-router-dom";
 
 import "./styles.css";
-import models from "../../modelData/models";
+import fetchModel from "../../lib/fetchModelData";
 
 function UserDetail() {
-    const { userId } = useParams();  
-    const user = models.userModel(userId);  
+  const { userId } = useParams();
 
-    if (!user) {
-        return <Typography>User not found</Typography>;
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    if (!userId) return;
+    async function getUserDetail() {
+      try {
+        const data = await fetchModel(`/user/${userId}`);
+
+        setUser(data);
+      } catch (error) {
+        console.error(error);
+      }
     }
 
-    return (
-        <div>
-          <Typography variant="h5">
-            {user.first_name} {user.last_name}
-          </Typography>
+    getUserDetail();
+  }, [userId]);
 
-          <Typography variant="body1">
-            <b>Location:</b> {user.location}
-          </Typography>
+  if (!user) {
+    return <Typography>Loading...</Typography>;
+  }
 
-          <Typography variant="body1">
-            <b>Occupation:</b> {user.occupation}
-          </Typography>
+  return (
+    <div>
+      <Typography variant="h5">{user.last_name}</Typography>
 
-          <Typography variant="body1">
-            <b>Description:</b> {user.description}
-          </Typography>
+      <Typography variant="body1">
+        <b>Location:</b> {user.location}
+      </Typography>
 
-          <br />
+      <Typography variant="body1">
+        <b>Occupation:</b> {user.occupation}
+      </Typography>
 
-          <Link to={`/photos/${user._id}`}>
-            View Photos
-          </Link>
-        </div>
-    );
+      <Typography variant="body1">
+        <b>Description:</b> {user.description}
+      </Typography>
+
+      <br />
+
+      <Link to={`/photos/${user._id}`}>View Photos</Link>
+    </div>
+  );
 }
 
 export default UserDetail;

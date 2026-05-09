@@ -1,19 +1,29 @@
 /**
  * fetchModel - Fetch a model from the web server.
  *
- * @param {string} url      The URL to issue the GET request.
- *
+ * @param {string} url
+ * @param {object} options
  */
-function fetchModel(url) {
-  return fetch(`http://localhost:8081/api${url}`)
+function fetchModel(url, options = {}) {
+  return fetch(`https://wwq944-8081.csb.app/api${url}`, {
+    credentials: "include",
+
+    headers: {
+      "Content-Type": "application/json",
+    },
+
+    ...options,
+  })
     .then((response) => {
       if (!response.ok) {
         throw new Error(`Request failed: ${response.status}`);
       }
+
       return response.json();
     })
     .catch((error) => {
       console.error("Fetch error:", error);
+
       throw error;
     });
 }
