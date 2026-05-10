@@ -14,6 +14,7 @@ function UserPhotos({ currentUser }) {
 
   const [file, setFile] = useState(null);
   const [notify, setNotify] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const handleAddComment = async (photoId) => {
     try {
@@ -73,13 +74,20 @@ function UserPhotos({ currentUser }) {
 
         setPhotos(data);
         setNotify("");
+        setLoading(true);
       } catch (error) {
         console.error(error);
+      } finally {
+        setLoading(false);
       }
     }
 
     getPhotos();
   }, [userId]);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
 
   if (photos.length === 0) {
     return <p>No photos found...</p>;
