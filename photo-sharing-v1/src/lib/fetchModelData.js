@@ -5,7 +5,7 @@
  * @param {object} options
  */
 function fetchModel(url, options = {}) {
-  return fetch(`http://localhost:8081/api${url}`, {
+  return fetch(`https://2njxmt-8081.csb.app/api${url}`, {
     ...options,
     credentials: "include",
     headers: {

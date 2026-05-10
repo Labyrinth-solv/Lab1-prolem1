@@ -5,7 +5,7 @@ import { useParams, Link } from "react-router-dom";
 import "./styles.css";
 import fetchModel from "../../lib/fetchModelData";
 
-function UserPhotos({currentUser}) {
+function UserPhotos({ currentUser }) {
   const { userId } = useParams();
 
   const [photos, setPhotos] = useState([]);
@@ -13,7 +13,7 @@ function UserPhotos({currentUser}) {
   const [commentText, setCommentText] = useState({});
 
   const [file, setFile] = useState(null);
-  const [notify, setNotify]=useState("");
+  const [notify, setNotify] = useState("");
 
   const handleAddComment = async (photoId) => {
     try {
@@ -21,13 +21,10 @@ function UserPhotos({currentUser}) {
 
       if (!text || text.trim() === "") return;
 
-      await fetchModel(
-        `/comment/commentsOfPhoto/${photoId}`,
-        {
-          method: "POST",
-          body: JSON.stringify({ comment: text }),
-        }
-      );
+      await fetchModel(`/comment/commentsOfPhoto/${photoId}`, {
+        method: "POST",
+        body: JSON.stringify({ comment: text }),
+      });
 
       // update UI
       const data = await fetchModel(`/photo/photosOfUser/${userId}`);
@@ -41,35 +38,32 @@ function UserPhotos({currentUser}) {
 
   const handleAddPhoto = async () => {
     if (!file) return;
-  
+
     const formData = new FormData();
     formData.append("photo", file);
-  
-    const res = await fetch("http://localhost:8081/api/photo/new", {
+
+    const res = await fetch("https://2njxmt-8081.csb.app/api/photo/new", {
       method: "POST",
       credentials: "include",
       body: formData,
     });
-  
+
     if (!res.ok) {
       console.log("Upload failed");
       setNotify("failed");
       return;
     }
-  
+
     const newPhoto = await res.json();
-  
+
     console.log("Uploaded:", newPhoto);
     setFile(null);
     setNotify("success");
-  
+
     // reload photos
-    const data = await fetch(
-      `http://localhost:8081/api/photo/photosOfUser/${userId}`,
-      { credentials: "include" }
-    );
-  
-    setPhotos(await data.json());
+    const data = await fetchModel(`photo/photosOfUser/${userId}`);
+
+    setPhotos(data);
   };
 
   useEffect(() => {
@@ -93,25 +87,20 @@ function UserPhotos({currentUser}) {
 
   return (
     <div>
-      {currentUser._id===userId&&<div>
-      <input
-        type="file"
-        onChange={(e) => setFile(e.target.files[0])}
-      />
-      <button onClick={handleAddPhoto}>
-        Add Photo
-      </button>
-      {notify&&<p style={{color:"green"}}>{notify}</p>}
-      </div>}
+      {currentUser._id === userId && (
+        <div>
+          <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+          <button onClick={handleAddPhoto}>Add Photo</button>
+          {notify && <p style={{ color: "green" }}>{notify}</p>}
+        </div>
+      )}
       <Typography variant="h5">User Photos</Typography>
-
-
 
       {photos.map((photo) => (
         <div className="user-photo-container" key={photo._id}>
           <img
             className="user-photo-image"
-            src={`http://localhost:8081/images/${photo.file_name}`}
+            src={`https://2njxmt-8081.csb.app/images/${photo.file_name}`}
             alt=""
           />
 
@@ -154,9 +143,7 @@ function UserPhotos({currentUser}) {
             placeholder="Write a comment..."
           />
 
-          <button onClick={() => handleAddComment(photo._id)}>
-            Comment
-          </button>
+          <button onClick={() => handleAddComment(photo._id)}>Comment</button>
         </div>
       ))}
     </div>
