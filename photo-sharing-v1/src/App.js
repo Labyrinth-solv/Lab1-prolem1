@@ -43,7 +43,10 @@ const App = (props) => {
                   path="/login"
                   element={<LoginRegister setCurrentUser={setCurrentUser} />}
                 />
-
+                <Route
+                  path="/users"
+                  element={<UserList />}
+                />
                 <Route
                   path="/users/:userId"
                   element={
@@ -57,7 +60,7 @@ const App = (props) => {
                   path="/photos/:userId"
                   element={
                     <ProtectedRoute currentUser={currentUser}>
-                      <UserPhotos />
+                      <UserPhotos currentUser={currentUser} />
                     </ProtectedRoute>
                   }
                 />

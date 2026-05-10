@@ -5,10 +5,72 @@ import { useParams, Link } from "react-router-dom";
 import "./styles.css";
 import fetchModel from "../../lib/fetchModelData";
 
-function UserPhotos() {
+function UserPhotos({currentUser}) {
   const { userId } = useParams();
 
   const [photos, setPhotos] = useState([]);
+
+  const [commentText, setCommentText] = useState({});
+
+  const [file, setFile] = useState(null);
+  const [notify, setNotify]=useState("");
+
+  const handleAddComment = async (photoId) => {
+    try {
+      const text = commentText[photoId];
+
+      if (!text || text.trim() === "") return;
+
+      await fetchModel(
+        `/comment/commentsOfPhoto/${photoId}`,
+        {
+          method: "POST",
+          body: JSON.stringify({ comment: text }),
+        }
+      );
+
+      // update UI
+      const data = await fetchModel(`/photo/photosOfUser/${userId}`);
+      setPhotos(data);
+
+      setCommentText((prev) => ({ ...prev, [photoId]: "" }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleAddPhoto = async () => {
+    if (!file) return;
+  
+    const formData = new FormData();
+    formData.append("photo", file);
+  
+    const res = await fetch("http://localhost:8081/api/photo/new", {
+      method: "POST",
+      credentials: "include",
+      body: formData,
+    });
+  
+    if (!res.ok) {
+      console.log("Upload failed");
+      setNotify("failed");
+      return;
+    }
+  
+    const newPhoto = await res.json();
+  
+    console.log("Uploaded:", newPhoto);
+    setFile(null);
+    setNotify("success");
+  
+    // reload photos
+    const data = await fetch(
+      `http://localhost:8081/api/photo/photosOfUser/${userId}`,
+      { credentials: "include" }
+    );
+  
+    setPhotos(await data.json());
+  };
 
   useEffect(() => {
     async function getPhotos() {
@@ -16,6 +78,7 @@ function UserPhotos() {
         const data = await fetchModel(`/photo/photosOfUser/${userId}`);
 
         setPhotos(data);
+        setNotify("");
       } catch (error) {
         console.error(error);
       }
@@ -25,18 +88,30 @@ function UserPhotos() {
   }, [userId]);
 
   if (photos.length === 0) {
-    return <p>Loading...</p>;
+    return <p>No photos found...</p>;
   }
 
   return (
     <div>
+      {currentUser._id===userId&&<div>
+      <input
+        type="file"
+        onChange={(e) => setFile(e.target.files[0])}
+      />
+      <button onClick={handleAddPhoto}>
+        Add Photo
+      </button>
+      {notify&&<p style={{color:"green"}}>{notify}</p>}
+      </div>}
       <Typography variant="h5">User Photos</Typography>
+
+
 
       {photos.map((photo) => (
         <div className="user-photo-container" key={photo._id}>
           <img
             className="user-photo-image"
-            src={`/images/${photo.file_name}`}
+            src={`http://localhost:8081/images/${photo.file_name}`}
             alt=""
           />
 
@@ -67,6 +142,21 @@ function UserPhotos() {
               No comments
             </Typography>
           )}
+          <input
+            type="text"
+            value={commentText[photo._id] || ""}
+            onChange={(e) =>
+              setCommentText({
+                ...commentText,
+                [photo._id]: e.target.value,
+              })
+            }
+            placeholder="Write a comment..."
+          />
+
+          <button onClick={() => handleAddComment(photo._id)}>
+            Comment
+          </button>
         </div>
       ))}
     </div>

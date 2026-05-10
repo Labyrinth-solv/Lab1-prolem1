@@ -11,6 +11,7 @@ function TopBar({ currentUser, setCurrentUser }) {
   const navigate = useNavigate();
   const [rightText, setRightText] = useState("");
 
+
   useEffect(() => {
     if (!currentUser) {
       setRightText("");
