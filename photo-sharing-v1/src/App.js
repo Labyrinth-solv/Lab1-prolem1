@@ -13,12 +13,13 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 const App = (props) => {
   const [currentUser, setCurrentUser] = useState(null);
+
   return (
     <Router>
       <div>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <TopBar currentUser={currentUser} />
+            <TopBar currentUser={currentUser} setCurrentUser={setCurrentUser} />
           </Grid>
 
           <Grid item xs={12}>

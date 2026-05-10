@@ -4,7 +4,7 @@ import React from "react";
 import fetchModel from "../lib/fetchModelData";
 import { useNavigate } from "react-router-dom";
 
-function LoginRegister(props) {
+function LoginRegister({ setCurrentUser }) {
   const [loginName, setLoginName] = useState("");
   const [error, setError] = useState("");
 
@@ -17,7 +17,7 @@ function LoginRegister(props) {
           login_name: loginName,
         }),
       });
-      props.setCurrentUser(data);
+      setCurrentUser(data);
       navigate(`/users/${data._id}`);
     } catch (err) {
       setError("Login failed");

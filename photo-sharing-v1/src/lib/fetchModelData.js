@@ -6,13 +6,12 @@
  */
 function fetchModel(url, options = {}) {
   return fetch(`https://7ys6jn-8081.csb.app/api${url}`, {
+    ...options,
     credentials: "include",
-
     headers: {
       "Content-Type": "application/json",
+      ...(options.headers || {}),
     },
-
-    ...options,
   })
     .then((response) => {
       if (!response.ok) {
